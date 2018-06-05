@@ -6,10 +6,10 @@ class TicTacToe(n: Int) {
     private var cols: IntArray = IntArray(n)
     private var diagonal: Int = 0;
     private var antiDiagonal: Int = 0
+    private var winningPlayer: Int = 0
 
     // The current player, can be either 1 or 2.
     var currentPlayer: Int = 1
-    var winningPlayer: Int = 0
     var numMovesMade: Int = 0
 
     /** Current player makes a move at ({row}, {col}).
@@ -45,8 +45,4 @@ class TicTacToe(n: Int) {
 
         return winningPlayer
     }
-
-    fun gameOver(): Boolean = numMovesMade == rows.size * rows.size || winningPlayer != 0
-
-
 }
