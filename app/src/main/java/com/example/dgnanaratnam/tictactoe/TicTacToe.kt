@@ -1,16 +1,20 @@
 package com.example.dgnanaratnam.tictactoe
 
 
-class TicTacToe(n: Int) {
-    private var rows: IntArray = IntArray(n)
-    private var cols: IntArray = IntArray(n)
+class TicTacToe(private val numRowsAndCols: Int) {
+    private var rows: IntArray = IntArray(numRowsAndCols)
+    private var cols: IntArray = IntArray(numRowsAndCols)
     private var diagonal: Int = 0;
     private var antiDiagonal: Int = 0
+    // Winning player is initially set to 0 (tied).
     private var winningPlayer: Int = 0
 
-    // The current player, can be either 1 or 2.
+    private var numMovesMade: Int =0
+
+    // The current play er, can be either 1 or 2.
     var currentPlayer: Int = 1
-    var numMovesMade: Int = 0
+
+
 
     /** Current player makes a move at ({row}, {col}).
      * @param row The row of the board.
@@ -43,6 +47,13 @@ class TicTacToe(n: Int) {
             currentPlayer
         } else 0
 
+        switchCurrentPlayer()
         return winningPlayer
+    }
+
+    fun gameOver(): Boolean = numMovesMade == numRowsAndCols * numRowsAndCols|| winningPlayer != 0
+
+    private fun switchCurrentPlayer(){
+        currentPlayer = if(currentPlayer == 1)  2  else  1
     }
 }

@@ -10,7 +10,10 @@ import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
 
-    private var ticTacToeGame: TicTacToe = TicTacToe(3)
+    private var gamesWonByPlayerOne = 0
+    private var gamesWonByPlayerTwo = 0
+    private var numTicTacRowsAndCols = 3
+    private var ticTacToeGame: TicTacToe = TicTacToe(numTicTacRowsAndCols)
     private var ticTacToeCells: MutableList<Button> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,11 +21,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val table: TableLayout = findViewById(R.id.tableLayout)
-        for(i in 0..2) {
+        for(i in 0 until numTicTacRowsAndCols) {
             var currentRow = TableRow(this)
-            for(j in 0..2) {
+            for(j in 0 until numTicTacRowsAndCols) {
                 val tickTackToeCell = Button(this)
-                tickTackToeCell.setOnClickListener(ticTacToeCellClick)
+                tickTackToeCell.setOnClickListener(ticTacToeCellListener)
                 ticTacToeCells.add(tickTackToeCell)
                 currentRow.addView(tickTackToeCell)
             }
@@ -30,11 +33,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.turn).text = "Turn: Player ${ticTacToeGame.currentPlayer}"
+        findViewById<TextView>(R.id.playerOneScore).text = "Player 1 Score: $gamesWonByPlayerOne"
+        findViewById<TextView>(R.id.playerTwoScore).text = "Player 2 Score: $gamesWonByPlayerTwo"
     }
 
-    private val ticTacToeCellClick: View.OnClickListener = View.OnClickListener{ view ->
+    private val ticTacToeCellListener: View.OnClickListener = View.OnClickListener{ view ->
+        ticTacToeCellClick(view)
+    }
+
+    private fun ticTacToeCellClick(view: View?) {
         val ticTacToeCell: Button = view as Button
-        val tableRow: TableRow =  ticTacToeCell.parent as TableRow
+        val tableRow: TableRow = ticTacToeCell.parent as TableRow
         val table: TableLayout = tableRow.parent as TableLayout
 
         // TODO: Find a better way to get cell row and cell column
@@ -42,38 +51,39 @@ class MainActivity : AppCompatActivity() {
         var cellColumn: Int = tableRow.indexOfChild(ticTacToeCell)
 
         ticTacToeCell.isEnabled = false
-        ticTacToeCell.text = if(ticTacToeGame.currentPlayer == 1) "X" else "O"
-        ticTacToeGame.numMovesMade++
+        ticTacToeCell.text = if (ticTacToeGame.currentPlayer == 1) "X" else "O"
 
-        val result = ticTacToeGame.move(cellRow,cellColumn)
+        val result = ticTacToeGame.move(cellRow, cellColumn)
         when {
             result == 1 -> {
+                gamesWonByPlayerOne++
                 enableTicTacToeCells(false)
                 findViewById<TextView>(R.id.winnerInfo).text = "Player 1 wins"
-
+                findViewById<TextView>(R.id.playerOneScore).text = "Player 1 Score: $gamesWonByPlayerOne"
             }
             result == 2 -> {
+                gamesWonByPlayerTwo++
                 enableTicTacToeCells(false)
                 findViewById<TextView>(R.id.winnerInfo).text = "Player 2 wins"
+                findViewById<TextView>(R.id.playerTwoScore).text = "Player 2 Score: $gamesWonByPlayerTwo"
             }
-            ticTacToeGame.numMovesMade == 9 -> {
+            ticTacToeGame.gameOver() -> {
                 findViewById<TextView>(R.id.winnerInfo).text = "Game Tied"
             }
             else -> {
-                ticTacToeGame.currentPlayer = if (ticTacToeGame.currentPlayer == 1) 2 else 1
                 findViewById<TextView>(R.id.turn).text = "Turn: Player ${ticTacToeGame.currentPlayer}"
             }
         }
     }
+
     fun resetClick(view: View) {
         enableTicTacToeCells(true)
         findViewById<TextView>(R.id.winnerInfo).text = ""
         ticTacToeCells.forEach({ it.text = "" })
-        ticTacToeGame = TicTacToe(3)
+        ticTacToeGame = TicTacToe(numTicTacRowsAndCols)
         findViewById<TextView>(R.id.turn).text = "Turn: Player ${ticTacToeGame.currentPlayer}"
     }
 
     private fun enableTicTacToeCells(enable: Boolean) = ticTacToeCells.forEach{it.isEnabled = enable}
 
 }
-
