@@ -13,39 +13,6 @@ class MainActivity : AppCompatActivity() {
     private var ticTacToeGame: TicTacToe = TicTacToe(3)
     private var ticTacToeCells: MutableList<Button> = mutableListOf()
 
-    private val ticTacToeCellClick: View.OnClickListener = View.OnClickListener{ view ->
-        val ticTacToeCell: Button = view as Button
-        val tableRow: TableRow =  ticTacToeCell.parent as TableRow
-        val table: TableLayout = tableRow.parent as TableLayout
-
-        // TODO: Find a better way to get cell row and cell column
-        var cellRow: Int = table.indexOfChild(tableRow)
-        var cellColumn: Int = tableRow.indexOfChild(ticTacToeCell)
-
-        ticTacToeCell.isEnabled = false
-        ticTacToeCell.text = if(ticTacToeGame.currentPlayer == 1) "X" else "O"
-        ticTacToeGame.numMovesMade++
-        val result = ticTacToeGame.move(cellRow,cellColumn)
-        when {
-            result == 1 -> {
-                enableSpaces(false)
-                findViewById<TextView>(R.id.winnerInfo).text = "Player 1 wins"
-
-            }
-            result == 2 -> {
-                enableSpaces(false)
-                findViewById<TextView>(R.id.winnerInfo).text = "Player 2 wins"
-            }
-            ticTacToeGame.numMovesMade == 9 -> {
-                findViewById<TextView>(R.id.winnerInfo).text = "Game Tied"
-            }
-            else -> {
-                ticTacToeGame.currentPlayer = if (ticTacToeGame.currentPlayer == 1) 2 else 1
-                findViewById<TextView>(R.id.turn).text = "Turn: Player ${ticTacToeGame.currentPlayer}"
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -63,19 +30,50 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.turn).text = "Turn: Player ${ticTacToeGame.currentPlayer}"
-
-
     }
 
-    private fun enableSpaces(enable: Boolean) = ticTacToeCells.forEach({it.isEnabled = enable})
+    private val ticTacToeCellClick: View.OnClickListener = View.OnClickListener{ view ->
+        val ticTacToeCell: Button = view as Button
+        val tableRow: TableRow =  ticTacToeCell.parent as TableRow
+        val table: TableLayout = tableRow.parent as TableLayout
 
+        // TODO: Find a better way to get cell row and cell column
+        var cellRow: Int = table.indexOfChild(tableRow)
+        var cellColumn: Int = tableRow.indexOfChild(ticTacToeCell)
+
+        ticTacToeCell.isEnabled = false
+        ticTacToeCell.text = if(ticTacToeGame.currentPlayer == 1) "X" else "O"
+        ticTacToeGame.numMovesMade++
+
+        val result = ticTacToeGame.move(cellRow,cellColumn)
+        when {
+            result == 1 -> {
+                enableTicTacToeCells(false)
+                findViewById<TextView>(R.id.winnerInfo).text = "Player 1 wins"
+
+            }
+            result == 2 -> {
+                enableTicTacToeCells(false)
+                findViewById<TextView>(R.id.winnerInfo).text = "Player 2 wins"
+            }
+            ticTacToeGame.numMovesMade == 9 -> {
+                findViewById<TextView>(R.id.winnerInfo).text = "Game Tied"
+            }
+            else -> {
+                ticTacToeGame.currentPlayer = if (ticTacToeGame.currentPlayer == 1) 2 else 1
+                findViewById<TextView>(R.id.turn).text = "Turn: Player ${ticTacToeGame.currentPlayer}"
+            }
+        }
+    }
     fun resetClick(view: View) {
-        enableSpaces(true)
+        enableTicTacToeCells(true)
         findViewById<TextView>(R.id.winnerInfo).text = ""
         ticTacToeCells.forEach({ it.text = "" })
         ticTacToeGame = TicTacToe(3)
         findViewById<TextView>(R.id.turn).text = "Turn: Player ${ticTacToeGame.currentPlayer}"
     }
+
+    private fun enableTicTacToeCells(enable: Boolean) = ticTacToeCells.forEach{it.isEnabled = enable}
 
 }
 
